@@ -2,11 +2,17 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const connectDB = require('./middlewares/db');
+const connectDB = require('./config/db');
+const errorMiddleware = require('./middlewares/error');
 
 const app = express();
 
 dotenv.config({ path: 'server/.env' });
+
+
+// Connect to MongoDB 
+connectDB();  
+
 
 // Routes - Define your API routes here
 const productRoutes = require('./routes/ProductRoutes');
@@ -16,11 +22,13 @@ const productRoutes = require('./routes/ProductRoutes');
 app.use(bodyParser.json());
 app.use(cors());
 
+
+// Routes Middlewares
 app.use('/api/products', productRoutes);
 
 
-// Connect to MongoDB 
-connectDB();  
+// middleware to handle error in APIs
+app.use(errorMiddleware)
 
 
 const port = process.env.PORT || 5000;
