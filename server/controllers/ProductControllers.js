@@ -1,11 +1,13 @@
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler");
 const Product = require("../models/ProductModel");
 const ErrorHandler = require("../utils/errorhandler");
+const ApiFeatures = require("../utils/apiFeatures")
 
 
 // can be only accessed by admin
 const createProduct = asyncErrorHandler(async (req, res, next) => {
     const productDetails = req.body;
+    // creating new document
     const createdProduct = new Product(productDetails);
     const savedProduct = await createdProduct.save();
 
@@ -18,7 +20,9 @@ const createProduct = asyncErrorHandler(async (req, res, next) => {
 
 // for public views
 const getAllProducts = asyncErrorHandler(async (req, res, next) => {
-    const products = await Product.find();
+    // calling ApiFeatures class
+    const apiFeature = new ApiFeatures(Product.find(), req.query).search()
+    const products = await apiFeature;
 
     res.status(200).json({
         success: true,
