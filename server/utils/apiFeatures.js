@@ -2,6 +2,7 @@ class ApiFeatures {
     constructor(query, api_querystr) {
         this.query = query                    // collection.find()
         this.api_querystr = api_querystr      // req.query
+        this.results;
     }
 
     // implementing Search method
@@ -13,23 +14,37 @@ class ApiFeatures {
         if (keyword) {
             conditions = {
                 name: {
-                    $regex: this.api_querystr.keyword,
+                    $regex: keyword,
                     $options: 'i'
                 }
             }
         }
-        // console.log(conditions)
-
+        console.log(conditions)
+        
         // implementing collection.find().find({ name: { '$regex': 'key.value', '$options': 'i' } })
-        const searched_documents = this.query.find(conditions)
-        return searched_documents;
+        this.results = this.query.find(conditions)
+        
+        return this;        // returning 'this' to enable method channing inside class 
     }
 
     // implementing filter method
     filter() {
-        const query_copy = {...this.query}
-        console.log(query_copy)
+        const query_copy = {...this.api_querystr}
+        const remove_fields = ['keyword', 'limit', 'page']
+
+        remove_fields.forEach((key) => delete query_copy[key])
+        // console.log(query_copy)
+
+        let queryStr = JSON.stringify(query_copy)
+        console.log(queryStr)
+        queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, (key) => `$${key}`);
+
+        console.log(JSON.parse(queryStr))
+
+        this.results = this.query.find(JSON.parse(queryStr))
+        
+        return this;
     }
 }
 
-module.exports = ApiFeatures
+module.exports = ApiFeatures 

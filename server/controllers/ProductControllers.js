@@ -21,12 +21,12 @@ const createProduct = asyncErrorHandler(async (req, res, next) => {
 // for public views
 const getAllProducts = asyncErrorHandler(async (req, res, next) => {
     // calling ApiFeatures class
-    const apiFeature = new ApiFeatures(Product.find(), req.query).search()
-    const products = await apiFeature;
+    const apiFeature = new ApiFeatures(Product.find(), req.query).search().filter()
+    const products = await apiFeature.results;      // return this.results
 
     res.status(200).json({
         success: true,
-        products
+        products 
     })
 })
 
